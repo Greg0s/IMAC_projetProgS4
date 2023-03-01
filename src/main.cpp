@@ -1,5 +1,6 @@
 #include "p6/p6.h"
 #include <cstdlib>
+#include <sys/_types/_size_t.h>
 #define DOCTEST_CONFIG_IMPLEMENT
 #include "doctest/doctest.h"
 
@@ -20,12 +21,24 @@ int main(int argc, char *argv[]) {
   auto ctx = p6::Context{{.title = "Simple-p6-Setup"}};
   ctx.maximize_window();
 
-  size_t nbSquare = 1;
+  size_t nbSquare = 15;
+  float speed = 0.002;
+  float size = 0.1f;
 
+  float squareSize = 1;
   std::vector<glm::vec2> points;
   std::vector<glm::vec2> directions;
   for (size_t i = 0; i < nbSquare; i++) {
-    points.push_back(p6::random::point(ctx));
+    // square appears only in the square
+    points.push_back(p6::random::point(
+        {
+            -squareSize + size,
+            -squareSize + size,
+        },
+        {
+            squareSize - size,
+            squareSize - size,
+        }));
     directions.push_back(p6::random::direction());
   }
 
@@ -33,11 +46,13 @@ int main(int argc, char *argv[]) {
   ctx.update = [&]() {
     ctx.background(p6::NamedColor::Blue);
 
-    ctx.square(p6::Center{0, 0}, p6::Radius{1.f});
+    // containeur (big square in the middle)
+    ctx.square(p6::Center{0, 0}, p6::Radius{squareSize});
 
     for (size_t i = 0; i < nbSquare; i++) {
-      ctx.square(p6::Center{points[i]}, p6::Radius{0.1f});
-      points[i] += p6::random::direction() * 0.02f;
+      ctx.square(p6::Center{points[i]}, p6::Radius{size});
+      glm::vec2 dir = directions[i];
+      points[i] += dir * speed;
     }
   };
 
