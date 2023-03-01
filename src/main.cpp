@@ -53,6 +53,13 @@ int main(int argc, char *argv[]) {
       ctx.square(p6::Center{points[i]}, p6::Radius{size});
       glm::vec2 dir = directions[i];
       points[i] += dir * speed;
+      float x = points[i].x;
+      float y = points[i].y;
+      if (x > squareSize - size || x < -squareSize + size) {
+        directions[i].x = -dir.x;
+      } else if (y > squareSize - size || y < -squareSize + size) {
+        directions[i].y = -dir.y;
+      }
     }
   };
 
