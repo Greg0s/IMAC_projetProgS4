@@ -21,7 +21,7 @@ public:
     void setDirectionX(const float& dirX);
     void setDirectionY(const float& dirY);
 
-    void showBoid();
+    void showBoid() const;
 
     glm::vec2         separationForce(std::vector<Boid> boids, uint boid);
     std::vector<Boid> getNearBoids(std::vector<Boid> boids, uint boid);

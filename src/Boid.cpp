@@ -15,10 +15,12 @@ glm::vec2 Boid::getSpeed() const
     return v;
 }
 
-void Boid::showBoid()
+void Boid::showBoid() const
 {
     std::cout << "-------BOID----------" << std::endl;
-    std::cout << "Pos: x " << pos.x << " y " << pos.y;
+    std::cout << "Pos: x " << pos.x << " y " << pos.y << std::endl;
+    std::cout << "Dir: x " << dir.x << " y " << dir.y << std::endl;
+    std::cout << "v: x " << v.x << " y " << v.y << std::endl;
 }
 
 float Boid::getX() const
