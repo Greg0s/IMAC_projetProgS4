@@ -2,6 +2,7 @@
 #include "p6/p6.h"
 // #include <sys/_types/_size_t.h>
 #define DOCTEST_CONFIG_IMPLEMENT
+#include "Boid.hpp"
 #include "doctest/doctest.h"
 
 int main(int argc, char* argv[])
@@ -20,17 +21,23 @@ int main(int argc, char* argv[])
     auto ctx = p6::Context{{.title = "Simple-p6-Setup"}};
     ctx.maximize_window();
 
-    size_t nbSquare = 15;
-    float  speed    = 0.002;
-    float  size     = 0.1f;
+    size_t    nbSquare = 15;
+    glm::vec2 speed    = {0.002, 0.002};
 
-    float                  squareSize = 1;
-    std::vector<glm::vec2> points;
-    std::vector<glm::vec2> directions;
+    float size = 0.1f;
+
+    float squareSize = 1;
+
+    glm::vec2 pos;
+    glm::vec2 direction;
+
+    std::vector<Boid> boids;
+
+    // création du vector des boids
     for (size_t i = 0; i < nbSquare; i++)
     {
-        // square appears only in the square
-        points.push_back(p6::random::point(
+        // square appears only in the square = center of the square
+        pos = p6::random::point(
             {
                 -squareSize + size,
                 -squareSize + size,
@@ -39,8 +46,14 @@ int main(int argc, char* argv[])
                 squareSize - size,
                 squareSize - size,
             }
-        ));
-        directions.push_back(p6::random::direction());
+        );
+        std::cout << "pos : " << pos.x << " " << pos.y << std::endl;
+        // squares have a random direction
+        direction = p6::random::direction();
+        // create the boid of the square i
+        Boid boid = Boid(pos, direction, speed);
+        // add this boid to the others
+        boids.push_back(boid);
     }
 
     // Declare your infinite update loop.
@@ -52,18 +65,25 @@ int main(int argc, char* argv[])
 
         for (size_t i = 0; i < nbSquare; i++)
         {
-            ctx.square(p6::Center{points[i]}, p6::Radius{size});
-            glm::vec2 dir = directions[i];
-            points[i] += dir * speed;
-            float x = points[i].x;
-            float y = points[i].y;
+            glm::vec2 centerPoint = boids.at(i).getPosition();
+            ctx.square(p6::Center(centerPoint), p6::Radius{size});
+            glm::vec2 dir = boids.at(i).getDirection();
+            std::cout << "centerPoint " << centerPoint.x << "  et  " << centerPoint.y << std::endl;
+            std::cout << "dir " << dir.x << "  et  " << dir.y << std::endl;
+
+            // speed += Boid::getSeparationForce(...);
+            // centerPoint += dir * speed.x;
+            boids.at(i).setPosition(boids.at(i).getPosition() + boids.at(i).getDirection() * boids.at(i).getSpeed());
+
+            float x = boids.at(i).getX();
+            float y = boids.at(i).getY();
             if (x > squareSize - size || x < -squareSize + size)
             {
-                directions[i].x = -dir.x;
+                boids.at(i).setDirectionX(-dir.x);
             }
             else if (y > squareSize - size || y < -squareSize + size)
             {
-                directions[i].y = -dir.y;
+                boids.at(i).setDirectionY(-dir.y);
             }
         }
     };
