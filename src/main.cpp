@@ -5,6 +5,16 @@
 #include "Boid.hpp"
 #include "doctest/doctest.h"
 
+void print(float val)
+{
+    std::cout << val << std::endl;
+}
+
+void print(glm::vec2 val)
+{
+    std::cout << "x: " << val.x << "y: " << val.y << std::endl;
+}
+
 int main(int argc, char* argv[])
 {
     { // Run the tests
@@ -63,28 +73,22 @@ int main(int argc, char* argv[])
         // containeur (big square in the middle)
         ctx.square(p6::Center{0, 0}, p6::Radius{squareSize});
 
+        // Const declaration
+        const float scope              = 0.2;
+        const float separationStrength = 0.1;
+        const float boundsStrength     = 2;
+
         for (size_t i = 0; i < nbSquare; i++)
         {
             glm::vec2 centerPoint = boids.at(i).getPosition();
+
             ctx.square(p6::Center(centerPoint), p6::Radius{size});
-            glm::vec2 dir = boids.at(i).getDirection();
-            std::cout << "centerPoint " << centerPoint.x << "  et  " << centerPoint.y << std::endl;
-            std::cout << "dir " << dir.x << "  et  " << dir.y << std::endl;
 
-            // speed += Boid::getSeparationForce(...);
-            // centerPoint += dir * speed.x;
-            boids.at(i).setPosition(boids.at(i).getPosition() + boids.at(i).getDirection() * boids.at(i).getSpeed());
+            boids.at(i).separationForce(boids, scope, separationStrength);
+            // boids.at(i).alignementForce(boids, scope, alignementStrength);
 
-            float x = boids.at(i).getX();
-            float y = boids.at(i).getY();
-            if (x > squareSize - size || x < -squareSize + size)
-            {
-                boids.at(i).setDirectionX(-dir.x);
-            }
-            else if (y > squareSize - size || y < -squareSize + size)
-            {
-                boids.at(i).setDirectionY(-dir.y);
-            }
+            boids.at(i).move();
+            boids.at(i).inSquare(squareSize, size, boundsStrength);
         }
     };
 
