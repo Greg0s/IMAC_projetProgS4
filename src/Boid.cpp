@@ -82,37 +82,58 @@ void Boid::setDirectionY(const float& dirY)
 //     return currentX < (boidX + minDistance) || currentX > (boidX - minDistance) || currentY > (boidY - minDistance) || currentY < (boidY + minDistance);
 // }
 
-glm::vec2 Boid::separationForce(std::vector<Boid> boids, uint boid)
+void Boid::move()
 {
-    glm::vec2 totalForce = {0, 0};
-
-    glm::vec2 boidPos = boids.at(boid).getPosition();
-
-    std::vector<Boid> nearBoids = getNearBoids(boids, boid);
-    for (auto nearBoid : nearBoids)
-    {
-        totalForce.x += boidPos.x - nearBoid.getPosition().x;
-        totalForce.y += boidPos.y - nearBoid.getPosition().y;
-    }
-    return totalForce;
+    pos += dir * v;
 }
 
-std::vector<Boid> Boid::getNearBoids(std::vector<Boid> boids, uint boid)
+void Boid::inSquare(const float& squareSize, const float& size, const float& strength)
+{
+    if (pos.x > squareSize - size || pos.x < -squareSize + size)
+    {
+        dir.x = strength * -dir.x;
+    }
+    if (pos.y > squareSize - size || pos.y < -squareSize + size)
+    {
+        dir.y = strength * -dir.y;
+    }
+}
+
+void Boid::separationForce(const std::vector<Boid>& boids, float scope, float strength)
+{
+    glm::vec2 totalForce = {0, 0};
+    uint      count      = 0;
+
+    std::vector<Boid> nearBoids = getNearBoids(boids, scope);
+    for (auto nearBoid : nearBoids)
+    {
+        totalForce += strength * (pos - nearBoid.getPosition()) / glm::distance(pos, nearBoid.getPosition());
+        count++;
+    }
+
+    if (count > 0)
+    {
+        totalForce /= static_cast<float>(count);
+        dir += totalForce;
+        dir = glm::normalize(dir);
+    }
+}
+
+std::vector<Boid> Boid::getNearBoids(const std::vector<Boid>& boids, float scope)
 {
     std::vector<Boid> nearBoids;
 
-    const float minDistance = 0.1;
-
-    float boidX = boids.at(boid).getPosition().x;
-    float boidY = boids.at(boid).getPosition().y;
-    for (uint i = 0; i < boids.size(); i++)
+    for (const auto& boid : boids)
     {
-        float currentX = boids.at(i).getPosition().x;
-        float currentY = boids.at(i).getPosition().y;
+        // to not count itself
+        if (this == &boid)
+            continue;
 
-        if (currentX < (boidX + minDistance) || currentX > (boidX - minDistance) || currentY > (boidY - minDistance) || currentY < (boidY + minDistance))
+        const float distance = glm::distance(pos, boid.getPosition());
+
+        if (distance > scope)
         {
-            nearBoids.push_back(boids.at(i));
+            nearBoids.push_back(boid);
         }
     }
     return nearBoids;

@@ -23,8 +23,9 @@ public:
 
     void showBoid() const;
 
-    glm::vec2         separationForce(std::vector<Boid> boids, uint boid);
-    std::vector<Boid> getNearBoids(std::vector<Boid> boids, uint boid);
-    void              separation(std::vector<Boid> boids, uint boidNum);
-    bool              isNear(Boid boid);
+    void move();
+    void inSquare(const float& squareSize, const float& size, const float& strength);
+
+    void              separationForce(const std::vector<Boid>& boids, float scope, float strength);
+    std::vector<Boid> getNearBoids(const std::vector<Boid>& boids, float scope);
 };
