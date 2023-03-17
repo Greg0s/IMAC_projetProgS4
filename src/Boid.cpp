@@ -15,7 +15,7 @@ glm::vec2 Boid::getSpeed() const
     return v;
 }
 
-void Boid::showBoid() const
+void Boid::printBoid() const
 {
     std::cout << "-------BOID----------" << std::endl;
     std::cout << "Pos: x " << pos.x << " y " << pos.y << std::endl;
@@ -47,40 +47,6 @@ void Boid::setDirectionY(const float& dirY)
 {
     dir.y = dirY;
 }
-
-// void Boid::separation(std::vector<Boid> boids, uint boidNum)
-// {
-//     Boid        boid        = boids.at(boidNum);
-//     const float avoidFactor = 0.05;
-
-//     glm::vec2 dir = {0.f, 0.f};
-//     for (uint i = 0; i < boids.size(); i++)
-//     {
-//         if (i != boidNum)
-//         {
-//             if (isNear(boid))
-//             {
-//                 dir.x += boid.pos.x - boids.at(i).getX();
-//                 dir.y += boid.pos.y - boids.at(i).getY();
-//             }
-//         }
-//     }
-
-//     boid.dir.x = dir.x * avoidFactor;
-//     boid.dir.y = dir.y * avoidFactor;
-// }
-
-// bool Boid::isNear(Boid boid)
-// {
-//     const float minDistance = 0.1;
-
-//     float currentX = boid.getX();
-//     float currentY = boid.getY();
-//     float boidX    = this->getX();
-//     float boidY    = this->getY();
-
-//     return currentX < (boidX + minDistance) || currentX > (boidX - minDistance) || currentY > (boidY - minDistance) || currentY < (boidY + minDistance);
-// }
 
 void Boid::move()
 {
@@ -138,7 +104,3 @@ std::vector<Boid> Boid::getNearBoids(const std::vector<Boid>& boids, float scope
     }
     return nearBoids;
 }
-
-// glm::vec2 getCenter(std::vector<Boid::Boid> boids)
-// {
-// }

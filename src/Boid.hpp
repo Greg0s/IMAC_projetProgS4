@@ -21,7 +21,7 @@ public:
     void setDirectionX(const float& dirX);
     void setDirectionY(const float& dirY);
 
-    void showBoid() const;
+    void printBoid() const;
 
     void move();
     void inSquare(const float& squareSize, const float& size, const float& strength);
