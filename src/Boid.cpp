@@ -104,3 +104,16 @@ std::vector<Boid> Boid::getNearBoids(const std::vector<Boid>& boids, float scope
     }
     return nearBoids;
 }
+
+void Boid::alignementForce(const std::vector<Boid>& boids, const float& scope, const float& strength)
+{
+    std::vector<Boid> nearBoids = getNearBoids(boids, scope);
+    glm::vec2         averageDirection;
+    for (auto nearBoid : nearBoids)
+    {
+        averageDirection += nearBoid.getDirection() * strength;
+    }
+    averageDirection /= boids.size();
+    dir += averageDirection;
+    dir = glm::normalize(dir);
+}

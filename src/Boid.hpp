@@ -28,4 +28,6 @@ public:
 
     void              separationForce(const std::vector<Boid>& boids, float scope, float strength);
     std::vector<Boid> getNearBoids(const std::vector<Boid>& boids, float scope);
+
+    void alignementForce(const std::vector<Boid>& boids, const float& scope, const float& strength);
 };

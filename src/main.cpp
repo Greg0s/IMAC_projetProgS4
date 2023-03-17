@@ -75,8 +75,9 @@ int main(int argc, char* argv[])
 
         // Const declaration
         const float scope              = 0.2;
-        const float separationStrength = 0.1;
+        const float separationStrength = 0.05;
         const float boundsStrength     = 2;
+        const float alignementStrength = 0.05;
 
         for (size_t i = 0; i < nbSquare; i++)
         {
@@ -85,7 +86,7 @@ int main(int argc, char* argv[])
             ctx.square(p6::Center(centerPoint), p6::Radius{size});
 
             boids.at(i).separationForce(boids, scope, separationStrength);
-            // boids.at(i).alignementForce(boids, scope, alignementStrength);
+            boids.at(i).alignementForce(boids, scope, alignementStrength);
 
             boids.at(i).move();
             boids.at(i).inSquare(squareSize, size, boundsStrength);
