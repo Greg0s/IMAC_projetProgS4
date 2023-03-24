@@ -30,4 +30,5 @@ public:
     std::vector<Boid> getNearBoids(const std::vector<Boid>& boids, float scope);
 
     void alignementForce(const std::vector<Boid>& boids, const float& scope, const float& strength);
+    void cohesionForce(const std::vector<Boid>& boids, const float& scope, const float& strength);
 };

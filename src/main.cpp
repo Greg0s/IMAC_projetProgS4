@@ -74,10 +74,11 @@ int main(int argc, char* argv[])
         ctx.square(p6::Center{0, 0}, p6::Radius{squareSize});
 
         // Const declaration
-        const float scope              = 0.2;
-        const float separationStrength = 0.05;
+        const float scope              = 0.5;
         const float boundsStrength     = 2;
+        const float separationStrength = 0.05;
         const float alignementStrength = 0.05;
+        const float cohesionStrength   = 0.05;
 
         for (size_t i = 0; i < nbSquare; i++)
         {
@@ -87,6 +88,7 @@ int main(int argc, char* argv[])
 
             boids.at(i).separationForce(boids, scope, separationStrength);
             boids.at(i).alignementForce(boids, scope, alignementStrength);
+            boids.at(i).cohesionForce(boids, scope, cohesionStrength);
 
             boids.at(i).move();
             boids.at(i).inSquare(squareSize, size, boundsStrength);

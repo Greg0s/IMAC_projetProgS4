@@ -65,26 +65,6 @@ void Boid::inSquare(const float& squareSize, const float& size, const float& str
     }
 }
 
-void Boid::separationForce(const std::vector<Boid>& boids, float scope, float strength)
-{
-    glm::vec2 totalForce = {0, 0};
-    uint      count      = 0;
-
-    std::vector<Boid> nearBoids = getNearBoids(boids, scope);
-    for (auto nearBoid : nearBoids)
-    {
-        totalForce += strength * (pos - nearBoid.getPosition()) / glm::distance(pos, nearBoid.getPosition());
-        count++;
-    }
-
-    if (count > 0)
-    {
-        totalForce /= static_cast<float>(count);
-        dir += totalForce;
-        dir = glm::normalize(dir);
-    }
-}
-
 std::vector<Boid> Boid::getNearBoids(const std::vector<Boid>& boids, float scope)
 {
     std::vector<Boid> nearBoids;
@@ -105,6 +85,26 @@ std::vector<Boid> Boid::getNearBoids(const std::vector<Boid>& boids, float scope
     return nearBoids;
 }
 
+void Boid::separationForce(const std::vector<Boid>& boids, float scope, float strength)
+{
+    glm::vec2 totalForce = {0, 0};
+    uint      count      = 0;
+
+    std::vector<Boid> nearBoids = getNearBoids(boids, scope);
+    for (auto nearBoid : nearBoids)
+    {
+        totalForce += strength * (pos - nearBoid.getPosition()) / glm::distance(pos, nearBoid.getPosition());
+        count++;
+    }
+
+    if (count > 0)
+    {
+        totalForce /= static_cast<float>(count);
+        dir += totalForce;
+        dir = glm::normalize(dir);
+    }
+}
+
 void Boid::alignementForce(const std::vector<Boid>& boids, const float& scope, const float& strength)
 {
     std::vector<Boid> nearBoids = getNearBoids(boids, scope);
@@ -115,5 +115,18 @@ void Boid::alignementForce(const std::vector<Boid>& boids, const float& scope, c
     }
     averageDirection /= boids.size();
     dir += averageDirection;
+    dir = glm::normalize(dir);
+}
+
+void Boid::cohesionForce(const std::vector<Boid>& boids, const float& scope, const float& strength)
+{
+    std::vector<Boid> nearBoids = getNearBoids(boids, scope);
+    glm::vec2         averagePosition;
+    for (auto nearBoid : nearBoids)
+    {
+        averagePosition /= nearBoid.getPosition() * strength;
+    }
+    averagePosition /= boids.size();
+    dir += averagePosition;
     dir = glm::normalize(dir);
 }
