@@ -67,16 +67,27 @@ int main(int argc, char* argv[])
     }
 
     // Const declaration
-    const float scope              = 0.5;
+    float       scope              = 0.5;
     const float wallScope          = 0.1;
     const float boundsStrength     = 1;
-    const float separationStrength = 0.04; // 2
-    const float alignementStrength = 0.03; // 5
-    const float cohesionStrength   = 0.01; // 5
+    float       separationStrength = 0.04; // 2
+    float       alignementStrength = 0.03; // 5
+    float       cohesionStrength   = 0.01; // 5
 
     // Declare your infinite update loop.
     ctx.update = [&]() {
         ctx.background(p6::NamedColor::Blue);
+
+        // Dear ImGUI
+        ctx.imgui = [&]() {
+            ImGui::Begin("Boids");
+            ImGui::SliderFloat("Boids scope", &scope, 0.f, 1.f);
+            ImGui::SliderFloat("Separation strength", &separationStrength, 0.f, 1.f);
+            ImGui::SliderFloat("Alignement strength", &alignementStrength, 0.f, 1.f);
+            ImGui::SliderFloat("Cohesion strength", &cohesionStrength, 0.f, 1.f);
+
+            ImGui::End();
+        };
 
         // containeur (big square in the middle)
         ctx.square(p6::Center{0, 0}, p6::Radius{squareSize});
