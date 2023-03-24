@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
     ctx.maximize_window();
 
     size_t    nbSquare = 15;
-    glm::vec2 speed    = {0.002, 0.002};
+    glm::vec2 speed    = {0.005, 0.005};
 
     float size = 0.1f;
 
@@ -66,19 +66,20 @@ int main(int argc, char* argv[])
         boids.push_back(boid);
     }
 
+    // Const declaration
+    const float scope              = 0.5;
+    const float wallScope          = 0.1;
+    const float boundsStrength     = 1;
+    const float separationStrength = 0.04; // 2
+    const float alignementStrength = 0.03; // 5
+    const float cohesionStrength   = 0.01; // 5
+
     // Declare your infinite update loop.
     ctx.update = [&]() {
         ctx.background(p6::NamedColor::Blue);
 
         // containeur (big square in the middle)
         ctx.square(p6::Center{0, 0}, p6::Radius{squareSize});
-
-        // Const declaration
-        const float scope              = 0.5;
-        const float boundsStrength     = 2;
-        const float separationStrength = 0.05;
-        const float alignementStrength = 0.05;
-        const float cohesionStrength   = 0.05;
 
         for (size_t i = 0; i < nbSquare; i++)
         {
@@ -91,7 +92,7 @@ int main(int argc, char* argv[])
             boids.at(i).cohesionForce(boids, scope, cohesionStrength);
 
             boids.at(i).move();
-            boids.at(i).inSquare(squareSize, size, boundsStrength);
+            boids.at(i).inSquare(squareSize, size, boundsStrength, wallScope);
         }
     };
 

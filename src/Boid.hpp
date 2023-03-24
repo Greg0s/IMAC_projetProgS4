@@ -24,7 +24,7 @@ public:
     void printBoid() const;
 
     void move();
-    void inSquare(const float& squareSize, const float& size, const float& strength);
+    void inSquare(const float& squareSize, const float& size, const float& strength, const float& scope);
 
     void              separationForce(const std::vector<Boid>& boids, float scope, float strength);
     std::vector<Boid> getNearBoids(const std::vector<Boid>& boids, float scope);
