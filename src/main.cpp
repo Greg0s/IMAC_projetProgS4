@@ -31,12 +31,12 @@ int main(int argc, char* argv[])
     auto ctx = p6::Context{{.title = "Simple-p6-Setup"}};
     ctx.maximize_window();
 
-    size_t    nbSquare = 15;
-    glm::vec2 speed    = {0.005, 0.005};
+    size_t    nbSquare = 50;
+    glm::vec2 speed    = {0.008, 0.008};
 
-    float size = 0.1f;
+    float size = 0.05f;
 
-    float squareSize = 1;
+    glm::vec2 squareSize = {1.7, 0.8};
 
     glm::vec2 pos;
     glm::vec2 direction;
@@ -49,12 +49,12 @@ int main(int argc, char* argv[])
         // square appears only in the square = center of the square
         pos = p6::random::point(
             {
-                -squareSize + size,
-                -squareSize + size,
+                -squareSize.x + size,
+                -squareSize.y + size,
             },
             {
-                squareSize - size,
-                squareSize - size,
+                squareSize.x - size,
+                squareSize.y - size,
             }
         );
         std::cout << "pos : " << pos.x << " " << pos.y << std::endl;
@@ -81,16 +81,18 @@ int main(int argc, char* argv[])
         // Dear ImGUI
         ctx.imgui = [&]() {
             ImGui::Begin("Boids");
-            ImGui::SliderFloat("Boids scope", &scope, 0.f, 1.f);
-            ImGui::SliderFloat("Separation strength", &separationStrength, 0.f, 1.f);
-            ImGui::SliderFloat("Alignement strength", &alignementStrength, 0.f, 1.f);
-            ImGui::SliderFloat("Cohesion strength", &cohesionStrength, 0.f, 1.f);
+            ImGui::SliderFloat("Scope", &scope, 0.f, 1.f);
+            ImGui::SliderFloat("Separation strength", &separationStrength, 0.f, 0.1);
+            ImGui::SliderFloat("Alignement strength", &alignementStrength, 0.f, 0.1);
+            ImGui::SliderFloat("Cohesion strength", &cohesionStrength, 0.f, 0.1);
 
             ImGui::End();
         };
 
         // containeur (big square in the middle)
-        ctx.square(p6::Center{0, 0}, p6::Radius{squareSize});
+        ctx.rectangle(p6::Center{0, 0}, p6::Radii{squareSize.x, squareSize.y});
+        // ctx.rectangle(p6::Center{0, 0}, p6::Radius{squareSize}, );
+        //  ctx.square(p6::Center{0, 0}, p6::Radius{squareSize});
 
         for (size_t i = 0; i < nbSquare; i++)
         {
