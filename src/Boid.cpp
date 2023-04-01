@@ -1,5 +1,6 @@
 #include "./Boid.hpp"
 #include "glm/ext/quaternion_geometric.hpp"
+#include "glm/fwd.hpp"
 
 glm::vec2 Boid::getPosition() const
 {
@@ -54,41 +55,27 @@ void Boid::move()
     pos += dir * v;
 }
 
-// void Boid::inSquare(const float& squareSize, const float& size, const float& strength)
-// {
-
-// }
-
-void Boid::inSquare(const float& squareSize, const float& size, const float& strength, const float& scope)
+void Boid::inSquare(const glm::vec2& squareSize, const float& size, const float& strength, const float& scope)
 {
-    // if (pos.x > squareSize - size || pos.x < -squareSize + size)
-    // {
-    //     dir.x = -dir.x;
-    // }
-    // if (pos.y > squareSize - size || pos.y < -squareSize + size)
-    // {
-    //     dir.y = -dir.y;
-    // }
-
     glm::vec2   boundsForce = {0., 0.};
     const float maxX        = 1;
     const float maxY        = 1;
     const float minX        = -1;
     const float minY        = -1;
 
-    if (pos.x > squareSize - size - scope)
+    if (pos.x > squareSize.x - size - scope)
     {
-        boundsForce.x = -glm::distance(pos.x, maxX) * (maxX / pos.x);
+        boundsForce.x = -glm::distance(pos.x, maxX) * (pos.x / maxX);
     }
-    if (pos.x < -squareSize + size + scope)
+    if (pos.x < -squareSize.x + size + scope)
     {
         boundsForce.x = glm::distance(pos.x, minX) * (minX / pos.x);
     }
-    if (pos.y > squareSize - size - scope)
+    if (pos.y > squareSize.y - size - scope)
     {
-        boundsForce.y = -glm::distance(pos.y, maxY) * (maxY / pos.y);
+        boundsForce.y = -glm::distance(pos.y, maxY) * (pos.y / maxY);
     }
-    if (pos.y < -squareSize + size + scope)
+    if (pos.y < -squareSize.y + size + scope)
     {
         boundsForce.y = glm::distance(pos.y, minY) * (minY / pos.y);
     }
@@ -97,57 +84,54 @@ void Boid::inSquare(const float& squareSize, const float& size, const float& str
     dir = glm::normalize(dir);
 }
 
-std::vector<Boid> Boid::getNearBoids(const std::vector<Boid>& boids, float scope)
+void Boid::separationForce(const std::vector<Boid>& boids, float scope, float strength)
 {
-    std::vector<Boid> nearBoids;
+    glm::vec2 totalForce = {0., 0.};
+    int       count      = 0;
 
     for (const auto& boid : boids)
     {
-        // to not count itself
         if (this == &boid)
             continue;
 
-        const float distance = glm::distance(pos, boid.getPosition());
-
-        if (distance > scope)
+        float distance = glm::distance(pos, boid.pos);
+        if (distance < scope)
         {
-            nearBoids.push_back(boid);
+            totalForce += strength * (pos - boid.pos) / distance;
+            count++;
         }
     }
-    return nearBoids;
-}
 
-void Boid::separationForce(const std::vector<Boid>& boids, float scope, float strength)
-{
-    glm::vec2         totalForce = {0., 0.};
-    std::vector<Boid> nearBoids  = getNearBoids(boids, scope);
-
-    if (!nearBoids.empty())
+    if (count > 0)
     {
-        for (auto nearBoid : nearBoids)
-        {
-            totalForce += (pos - nearBoid.getPosition()) / glm::distance(pos, nearBoid.getPosition());
-        }
-
-        totalForce /= nearBoids.size();
-        dir += totalForce * strength;
+        totalForce /= static_cast<float>(count);
+        dir += totalForce;
         dir = glm::normalize(dir);
     }
 }
 
 void Boid::alignementForce(const std::vector<Boid>& boids, const float& scope, const float& strength)
 {
-    glm::vec2         averageDirection = {0., 0.};
-    std::vector<Boid> nearBoids        = getNearBoids(boids, scope);
+    glm::vec2 averageDirection = {0., 0.};
+    float     count            = 0;
 
-    if (!nearBoids.empty())
+    for (const auto& boid : boids)
     {
-        for (auto nearBoid : nearBoids)
-        {
-            averageDirection += nearBoid.getDirection();
-        }
+        if (this == &boid)
+            continue;
 
-        averageDirection /= nearBoids.size();
+        const float distance = glm::distance(pos, boid.pos);
+
+        if (distance < scope)
+        {
+            averageDirection += boid.dir;
+            count++;
+        }
+    }
+
+    if (count > 0)
+    {
+        averageDirection /= count;
         dir += averageDirection * strength;
         dir = glm::normalize(dir);
     }
@@ -155,17 +139,25 @@ void Boid::alignementForce(const std::vector<Boid>& boids, const float& scope, c
 
 void Boid::cohesionForce(const std::vector<Boid>& boids, const float& scope, const float& strength)
 {
-    glm::vec2         averagePosition = {0.0, 0.0};
-    std::vector<Boid> nearBoids       = getNearBoids(boids, scope);
+    glm::vec2 averagePosition = {0.0, 0.0};
+    float     count           = 0;
 
-    if (!nearBoids.empty())
+    for (const auto& boid : boids)
     {
-        for (auto nearBoid : nearBoids)
+        if (this == &boid)
+            continue;
+
+        const float distance = glm::distance(pos, boid.pos);
+        if (distance < scope)
         {
-            averagePosition /= nearBoid.getPosition();
+            averagePosition += boid.pos;
+            count++;
         }
-        averagePosition /= nearBoids.size();
-        dir += averagePosition * strength;
+    }
+    if (count > 0)
+    {
+        averagePosition /= count;
+        dir += (averagePosition - pos) * strength;
         dir = glm::normalize(dir);
     }
 }
