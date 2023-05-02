@@ -1,5 +1,6 @@
 #include <cstddef>
 #include <cstdlib>
+#include "glm/fwd.hpp"
 #include "p6/p6.h"
 // #include <sys/_types/_size_t.h>
 #define DOCTEST_CONFIG_IMPLEMENT
@@ -16,7 +17,22 @@ void print(glm::vec2 val)
     std::cout << "x: " << val.x << "y: " << val.y << std::endl;
 }
 
-std::vector<Boid> boidsPos(size_t nbSquare, glm::vec2 squareSize, float size)
+glm::vec2 randomPos(glm::vec2 squareSize, float size)
+{
+    glm::vec2 pos;
+    return pos = p6::random::point(
+               {
+                   -squareSize.x + size,
+                   -squareSize.y + size,
+               },
+               {
+                   squareSize.x - size,
+                   squareSize.y - size,
+               }
+           );
+}
+
+std::vector<Boid> boidsVec(size_t nbSquare, glm::vec2 squareSize, float size)
 {
     std::vector<Boid> boids;
 
@@ -28,23 +44,19 @@ std::vector<Boid> boidsPos(size_t nbSquare, glm::vec2 squareSize, float size)
     for (size_t i = 0; i < nbSquare; i++)
     {
         // square appears only in the square = center of the square
-        pos = p6::random::point(
-            {
-                -squareSize.x + size,
-                -squareSize.y + size,
-            },
-            {
-                squareSize.x - size,
-                squareSize.y - size,
-            }
-        );
-        std::cout << "pos : " << pos.x << " " << pos.y << std::endl;
+        pos = randomPos(squareSize, size);
+
         // squares have a random direction
         direction = p6::random::direction();
+
         // create the boid of the square i
         Boid boid = Boid(pos, direction, speed);
+
         // add this boid to the others
         boids.push_back(boid);
+
+        // print pos for debug
+        std::cout << "pos : " << pos.x << " " << pos.y << std::endl;
     }
     return boids;
 }
@@ -71,7 +83,7 @@ int main(int argc, char* argv[])
 
     glm::vec2 squareSize = {1.7, 0.8};
 
-    std::vector<Boid> boids = boidsPos(nbSquare, squareSize, size);
+    std::vector<Boid> boids = boidsVec(nbSquare, squareSize, size);
 
     // Const declaration
     float       scope              = 0.5;
@@ -98,8 +110,6 @@ int main(int argc, char* argv[])
 
         // containeur (big square in the middle)
         ctx.rectangle(p6::Center{0, 0}, p6::Radii{squareSize.x, squareSize.y});
-        // ctx.rectangle(p6::Center{0, 0}, p6::Radius{squareSize}, );
-        //  ctx.square(p6::Center{0, 0}, p6::Radius{squareSize});
 
         for (size_t i = 0; i < nbSquare; i++)
         {
