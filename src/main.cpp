@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <cstdlib>
 #include "p6/p6.h"
 // #include <sys/_types/_size_t.h>
@@ -15,33 +16,13 @@ void print(glm::vec2 val)
     std::cout << "x: " << val.x << "y: " << val.y << std::endl;
 }
 
-int main(int argc, char* argv[])
+std::vector<Boid> boidsPos(size_t nbSquare, glm::vec2 squareSize, float size)
 {
-    { // Run the tests
-        if (doctest::Context{}.run() != 0)
-            return EXIT_FAILURE;
-        // The CI does not have a GPU so it cannot run the rest of the code.
-        const bool no_gpu_available =
-            argc >= 2 && strcmp(argv[1], "-nogpu") == 0; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-        if (no_gpu_available)
-            return EXIT_SUCCESS;
-    }
-
-    // Actual app
-    auto ctx = p6::Context{{.title = "Simple-p6-Setup"}};
-    ctx.maximize_window();
-
-    size_t    nbSquare = 50;
-    glm::vec2 speed    = {0.008, 0.008};
-
-    float size = 0.05f;
-
-    glm::vec2 squareSize = {1.7, 0.8};
+    std::vector<Boid> boids;
 
     glm::vec2 pos;
     glm::vec2 direction;
-
-    std::vector<Boid> boids;
+    glm::vec2 speed = {0.008, 0.008};
 
     // création du vector des boids
     for (size_t i = 0; i < nbSquare; i++)
@@ -65,6 +46,32 @@ int main(int argc, char* argv[])
         // add this boid to the others
         boids.push_back(boid);
     }
+    return boids;
+}
+
+int main(int argc, char* argv[])
+{
+    { // Run the tests
+        if (doctest::Context{}.run() != 0)
+            return EXIT_FAILURE;
+        // The CI does not have a GPU so it cannot run the rest of the code.
+        const bool no_gpu_available =
+            argc >= 2 && strcmp(argv[1], "-nogpu") == 0; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+        if (no_gpu_available)
+            return EXIT_SUCCESS;
+    }
+
+    // Actual app
+    auto ctx = p6::Context{{.title = "Simple-p6-Setup"}};
+    ctx.maximize_window();
+
+    size_t nbSquare = 50;
+
+    float size = 0.05f;
+
+    glm::vec2 squareSize = {1.7, 0.8};
+
+    std::vector<Boid> boids = boidsPos(nbSquare, squareSize, size);
 
     // Const declaration
     float       scope              = 0.5;
