@@ -7,6 +7,18 @@
 #include "Boid.hpp"
 #include "doctest/doctest.h"
 
+struct strengths {
+    const float boundsStrength     = 1;
+    float       separationStrength = 0.04; // 2
+    float       alignementStrength = 0.03; // 5
+    float       cohesionStrength   = 0.01; // 5
+};
+
+struct scopes {
+    float       scope     = 0.5;
+    const float wallScope = 0.1;
+};
+
 void print(float val)
 {
     std::cout << val << std::endl;
@@ -56,7 +68,7 @@ std::vector<Boid> boidsVec(size_t nbSquare, glm::vec2 squareSize, float size)
         boids.push_back(boid);
 
         // print pos for debug
-        std::cout << "pos : " << pos.x << " " << pos.y << std::endl;
+        // std::cout << "pos : " << pos.x << " " << pos.y << std::endl;
     }
     return boids;
 }
@@ -86,12 +98,8 @@ int main(int argc, char* argv[])
     std::vector<Boid> boids = boidsVec(nbSquare, squareSize, size);
 
     // Const declaration
-    float       scope              = 0.5;
-    const float wallScope          = 0.1;
-    const float boundsStrength     = 1;
-    float       separationStrength = 0.04; // 2
-    float       alignementStrength = 0.03; // 5
-    float       cohesionStrength   = 0.01; // 5
+    scopes    scopes;
+    strengths strengths;
 
     // Declare your infinite update loop.
     ctx.update = [&]() {
@@ -100,10 +108,10 @@ int main(int argc, char* argv[])
         // Dear ImGUI
         ctx.imgui = [&]() {
             ImGui::Begin("Boids");
-            ImGui::SliderFloat("Scope", &scope, 0.f, 1.f);
-            ImGui::SliderFloat("Separation strength", &separationStrength, 0.f, 0.1);
-            ImGui::SliderFloat("Alignement strength", &alignementStrength, 0.f, 0.1);
-            ImGui::SliderFloat("Cohesion strength", &cohesionStrength, 0.f, 0.1);
+            ImGui::SliderFloat("Scope", &scopes.scope, 0.f, 1.f);
+            ImGui::SliderFloat("Separation strength", &strengths.separationStrength, 0.f, 0.1);
+            ImGui::SliderFloat("Alignement strength", &strengths.alignementStrength, 0.f, 0.1);
+            ImGui::SliderFloat("Cohesion strength", &strengths.cohesionStrength, 0.f, 0.1);
 
             ImGui::End();
         };
@@ -117,12 +125,12 @@ int main(int argc, char* argv[])
 
             ctx.square(p6::Center(centerPoint), p6::Radius{size});
 
-            boids.at(i).separationForce(boids, scope, separationStrength);
-            boids.at(i).alignementForce(boids, scope, alignementStrength);
-            boids.at(i).cohesionForce(boids, scope, cohesionStrength);
+            boids.at(i).separationForce(boids, scopes.scope, strengths.separationStrength);
+            boids.at(i).alignementForce(boids, scopes.scope, strengths.alignementStrength);
+            boids.at(i).cohesionForce(boids, scopes.scope, strengths.cohesionStrength);
 
             boids.at(i).move();
-            boids.at(i).inSquare(squareSize, size, boundsStrength, wallScope);
+            boids.at(i).inSquare(squareSize, size, strengths.boundsStrength, scopes.wallScope);
         }
     };
 
